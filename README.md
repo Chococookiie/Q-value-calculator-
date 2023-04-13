@@ -1,7 +1,7 @@
 # Q-value-calculator-
-Calcutate the Q value for a given equtaion
+Calcutate the Q value for a given equtaion.
 
-Use the following sample equation as sample input
+Use the following sample equation as sample input. ( Check console to see the flow and working of code )
 
 4He + 14N = 17O + 1H
 
