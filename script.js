@@ -4,58 +4,51 @@
 // https://github.com/neelpatel05/periodic-table-api  --> more detail on use of API
 
 // const c = 299792458; // speed of light in m/s
-const c = 931.5 //MeV/c^2
-const uToKg = 1.66054e-27; // conversion factor from atomic mass unit (u) to kilograms (kg)
-
-const n = 1.008665 // mass of neutron in amu
-const p = 1.00727647 // mass of proton in amu
-
+const c_in_MeV = 931.5 //MeV/c^2
 
 const calcBtn = document.querySelector('.calculate')
 const ans = document.getElementById('myDiv')
 
 calcBtn.addEventListener('click', () => {
-//   console.log(calc())
-ans.innerText = calc()
-console.log(ans.innerText)
+   ans.innerText = 'The Q Value is: - '
+   massSum()
 })
 
- function calc(){
-   // console.log('am i working ')
+async function massSum(){
+   
+const reactants = document.querySelector('.reactants').value.split('+')
+const products = document.querySelector('.products').value.split('+')
 
-   // Get elements from reactant and product side 
-   const reactants = document.querySelector('.reactants').value.split('+')
-   const products = document.querySelector('.products').value.split('+')
-
+   let totalReactMass = 0 
+   let totalProdMass = 0
    const reactantSym = getElementSymbol(reactants)  // array of symbols from reactant nd product side
    const productSym = getElementSymbol(products)
 
-   // total Mass sum on one side 
-   const totalReactMass= massSum(reactantSym)
-   const totalProdMass= massSum(productSym)
+   //find total reactant mass
+   for(let i = 0 ; i< reactantSym.length;i++){
+      eleMass = await getElementAtomicMass(reactantSym[i])
+      totalReactMass += +eleMass.slice(0,-3)
+   }
+
+   // find total product mass
+   for(let i = 0 ; i< productSym.length;i++){
+      eleMass = await getElementAtomicMass(productSym[i])
+      totalProdMass += +eleMass.slice(0,-3)
+   } 
+   console.log(totalReactMass, totalProdMass)
 
    // find the qvalue
-   const qvalue =  totalReactMass - totalProdMass * c * c
+   const qvalue =  (totalReactMass - totalProdMass) * c_in_MeV
    console.log('q value is ' + qvalue)
-   return qvalue
-}
+   ans.innerText = `The Q Value is: ${qvalue} MeV `
+  }
 
-async function getElementAtomicMass(el) {
+   async function getElementAtomicMass(el) {
    const response = await fetch(`https://neelpatel05.pythonanywhere.com/element/symbol?symbol=${el}`)
    var data = await response.json() 
+   console.log(el + data.atomicMass)
    return  data.atomicMass
 }
-
-async function massSum(elearr){
-   let totalMass = 0 
-
-   for(let i = 0 ; i< elearr.length;i++){
-      eleMass = await getElementAtomicMass(elearr[i])
-      totalMass += +eleMass.slice(0,-3)
-   }
-   console.log('Mass for ' + elearr + ' : ' + totalMass )
-   return totalMass
-  }
 
 function getElementSymbol(eleArray) {
    const symArray = []
@@ -73,9 +66,4 @@ function getElementSymbol(eleArray) {
 
 capitalizeFirstLetter = (str) => {
    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function findQvalue(reactantMass, productMass) {
-   const qvalue = reactantMass - productMass * c * c
-   return qvalue
 }
